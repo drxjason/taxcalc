@@ -6,7 +6,7 @@
 # - [DONE] Implement verbosity --verbose/-v
 # - [PDONE] Hopefully not break the program
 # - Generate a calculation and combine argument flags --example/-e and --verbose/-v
-# - Interaction Mode (extra)
+# - [DONE] Interaction Mode (extra) 
 # - Implement verbosity with file saving
 # - [DONE] Implement --clean/-c to delete result files that were made by the program [Finish when implement custom file extension]
 
@@ -46,6 +46,12 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    '--interactive', '-i',
+    help='throws user into an interactive prompt (emulated prompt)',
+    action='store_true'
+)
+
+parser.add_argument(
     '--verbose', '-v',
     help='spits the calculation into stdout',
     action='store_true'
@@ -69,6 +75,14 @@ def fileVerbose():
     fdata.write("{}% tax\n".format(args.percentage))
     fdata.write("total = {}\n".format(tax(args.subtotal, args.percentage)))
     fdata.close()
+
+def interactive_usage():
+    print("interactive > [COMMAND]\n")
+    print("commands: \n")
+    print("     help        displays usage")
+    print("     txc         tax calculator")
+    print("     clear       clears the screen")
+    print("     exit        exits interactive mode\n")
 
 if args.subtotal and args.percentage:
     if args.save:
@@ -95,7 +109,8 @@ if args.subtotal and args.percentage:
                     fdata.close()
                     print("overwritten", args.save)
             else:
-                print("invalid extension, accepted extension(s) [.reslt]")
+                print("invalid extension, accepted extension(s) [.reslt]")    
+
     elif args.verbose:
         verbose()
 
@@ -118,5 +133,26 @@ else:
                 break
         else:
             print('there is nothing to clean')
+
+    elif args.interactive:
+        while True:
+            prompt = input("interactive > ")
+            if prompt in ("help"):
+                interactive_usage()
+
+            elif prompt in ("exit"):
+                break
+
+            elif prompt in ("clear"):
+                os.system("clear")
+
+            elif prompt in ("txc"):
+                subtotal_i = float(input("subtotal: "))
+                percentage_i = float(input("percentage: "))
+
+                total_i = tax(subtotal_i, percentage_i)
+                print(total_i)
+            else:
+                print("invalid command")
     else:
         usage_example()
